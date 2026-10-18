@@ -12,7 +12,8 @@
 | Epic Games | 官网自助退款 | 14 天内 + 游戏时长 < 2 小时，部分商品例外 |
 | Xbox / Microsoft Store | account.microsoft.com → 订单历史 → 申请退款 | 14 天内且未大量使用 |
 | PlayStation Store | 官网客服退款表单 | 14 天内且未开始下载/观看 |
-| Nintendo eShop（美服） | 基本无退款政策 | 美服别浪费时间；欧服有 14 天冷却期例外 |
+| Nintendo eShop（美服） | 基本无退款政策 | 别浪费时间 |
+| Nintendo eShop（欧服） | 官方 14 天冷却期退款表单 | 未使用数字内容 14 天内可申请 |
 
 ## 有支持渠道但非传统邮箱
 

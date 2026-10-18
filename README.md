@@ -33,12 +33,18 @@
 技能目录就是仓库根目录，克隆到你的技能目录即可：
 
 ```bash
-# ZCode
-git clone https://github.com/vc999999999/refund-email-skill ~/.agents/skills/refund-email
-
-# Claude Code（同格式，直接兼容）
-git clone https://github.com/vc999999999/refund-email-skill ~/.claude/skills/refund-email
+git clone https://github.com/vc999999999/refund-email-skill <技能目录>/refund-email
 ```
+
+各框架的技能目录：
+
+| 框架 | 技能目录 |
+|---|---|
+| ZCode | `~/.agents/skills/` |
+| Claude Code | `~/.claude/skills/` |
+| Antigravity | `~/.gemini/antigravity-cli/skills/` |
+
+> 其他框架请查阅各自文档中关于 skill/plugin 目录的说明。
 
 装好后在对话里提到"退款、被扣费、自动续费想退"等就会自动触发，也可以显式 `/refund-email`。
 

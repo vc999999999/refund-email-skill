@@ -19,10 +19,12 @@ I would prefer to resolve this directly with you and hope we can do so.
 
 Best regards,
 {姓名}
+({账户邮箱})
 ```
 
 ## 规则
 
 - 发出前和用户确认：列出的行动（拒付、投诉）是用户真的愿意执行的——写了不做，下次就更没信用。
 - 措辞保持克制，给对方台阶（"would prefer to resolve this directly with you"）。
+- `({账户邮箱})`：在原邮件串 reply 时可省略（对方已有上下文）；若是升级投诉渠道的独立新邮件，必须保留，方便对方查单。
 - 仍无回应 → 按 SKILL.md 跟进流程指引用户走银行拒付，并如实说明封号风险。

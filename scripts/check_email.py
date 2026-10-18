@@ -15,10 +15,12 @@ EARLY_STAGES = {"first-contact", "follow-up"}
 
 # 所有阶段都禁止——诉讼/曝光超出退款邮件应有的克制
 FORBIDDEN_ALWAYS = [
-    (r"\bsue\b", "sue"), (r"\bsuing\b", "suing"),
-    (r"\blawyer\b", "lawyer"), (r"\battorney\b", "attorney"),
-    (r"legal\s+action", "legal action"),
-    (r"social\s+media", "social media"), (r"\bexpose\b", "expose"),
+    (r"\bsue\b|\bsued\b|\bsuing\b", "sue/sued/suing"),
+    (r"\blawyer\b|\battorney\b", "lawyer/attorney"),
+    (r"legal\s+(?:action|proceeding|step|recourse)", "legal action/proceedings"),
+    (r"\bexpose\s+(?:you|this|your)\b", "expose (targeted)"),
+    (r"go\s+public\b", "go public"),
+    (r"social\s+media", "social media"),
 ]
 # 仅首封/跟进禁止——这两张牌只能打在 final-notice
 FORBIDDEN_EARLY = [
@@ -28,23 +30,32 @@ FORBIDDEN_EARLY = [
 ]
 
 AMOUNT = re.compile(
-    r"(?:[$€£¥]\s?\d[\d,]*(?:\.\d+)?|\d[\d,]*(?:\.\d+)?\s?(?:USD|EUR|GBP|CNY|dollars?\b))",
+    r"(?:[$€£¥]\s?\d[\d,.]*"               # 符号前置: $29.99, €1,200
+    r"|\b(?:USD|EUR|GBP|CNY)\s+\d[\d,.]*"  # 码前置: USD 29.99
+    r"|\d[\d,.]+\s?(?:USD|EUR|GBP|CNY|dollars?\b))",  # 码后置: 29.99 USD
     re.I,
 )
-ORDER_ID = re.compile(r"#\s?[A-Za-z0-9][A-Za-z0-9-]{2,}")
+ORDER_ID = re.compile(r"#\s?[A-Za-z0-9][A-Za-z0-9-]{4,}")
 DATE = re.compile(
-    r"(?:\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4}"
-    r"|\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}/\d{1,2}/\d{2,4}\b)"
+    r"(?:"
+    r"\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2}(?:st|nd|rd|th)?,?(?:\s+\d{4})?"  # Oct 3, 2024 或 Oct 3
+    r"|\b\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}"  # 3 October 2024
+    r"|\b\d{4}-\d{2}-\d{2}\b"                     # 2024-10-03
+    r"|\b\d{1,2}/\d{1,2}/(?:\d{2}|\d{4})\b"       # 10/3/2024
+    r")"
 )
 PLACEHOLDER = re.compile(r"\{[^}]*\}|【[^】]*】|\bTODO\b|\bFIXME\b|_{3,}|X{3,}", re.I)
-GREETING = re.compile(r"^\s*Dear\b", re.M)
+GREETING = re.compile(r"^\s*(?:Dear|Hello|Hi)\b", re.M)
 SIGNOFF = re.compile(r"(Best\s+regards|Regards|Sincerely|Kind\s+regards)", re.I)
 
 
 def main():
     valid_stages = set(EARLY_STAGES) | {"final-notice"}
-    if len(sys.argv) != 3 or sys.argv[2] not in valid_stages:
-        print(__doc__)
+    if len(sys.argv) != 3:
+        print(f"用法: {sys.argv[0]} <邮件文件> <first-contact|follow-up|final-notice>")
+        return 1
+    if sys.argv[2] not in valid_stages:
+        print(f"✗ 阶段参数无效: {sys.argv[2]!r}，合法值: {sorted(valid_stages)}")
         return 1
     path, stage = sys.argv[1], sys.argv[2]
     try:
@@ -54,11 +65,17 @@ def main():
         print(f"✗ 无法读取文件: {e}")
         return 1
 
-    lines = [ln for ln in text.splitlines() if ln.strip()]
-    if not lines:
-        print("✗ 文件为空")
+    raw_lines = text.splitlines()
+    if not raw_lines or not raw_lines[0].strip():
+        print("✗ 文件格式错误：第一行必须是主题")
         return 1
-    subject, body = lines[0], "\n".join(lines[1:])
+    subject = raw_lines[0].strip()
+    body = "\n".join(raw_lines[1:]).strip()
+    if not body:
+        print("✗ 正文为空")
+        return 1
+    if re.search(r"[\u4e00-\u9fff]{10,}", body):
+        print("⚠ 正文疑似包含中文，请确认临时文件仅含英文正文")
 
     results = []
 
@@ -75,7 +92,7 @@ def main():
     results.append((AMOUNT.search(body) is not None, "正文含金额"))
     results.append((DATE.search(body) is not None, "正文含购买/扣款日期"))
     results.append((re.search(r"refund", body, re.I) is not None, "正文含明确诉求(refund)"))
-    results.append((GREETING.search(body) is not None, "有称呼(Dear …)"))
+    results.append((GREETING.search(body) is not None, "有称呼(Dear / Hello / Hi …)"))
     results.append((SIGNOFF.search(body) is not None, "有落款(Best regards…)"))
 
     banned = list(FORBIDDEN_ALWAYS) + (FORBIDDEN_EARLY if stage in EARLY_STAGES else [])

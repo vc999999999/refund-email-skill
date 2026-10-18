@@ -11,7 +11,7 @@ Order #{订单号} ({金额}), which I have not yet received a response to.
 I understand support teams are busy, but I would appreciate an update
 on the status of my request.
 
-If I do not hear back within {5} business days, I will need to
+If I do not hear back within 5 business days, I will need to
 consider other options to resolve this matter.
 
 Thank you for your time.

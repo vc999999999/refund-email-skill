@@ -31,9 +31,10 @@ Best regards,
 - **D 未交付：** "I have not received the product/service despite payment on {日期}, which is now {N} days ago."
 - **E 取消仍被扣：** "I cancelled my subscription on {日期}, before the trial period ended, yet I was charged {金额} on {日期}."
 - **F 未授权：** "I did not authorize this charge."
+- **G 未使用/改变主意：** "I purchased {产品} on {日期} but have not used it, and I am requesting a refund within your stated refund window."
 
 ## 规则
 
 - 所有 `{}` 内容必须来自用户提供的信息；给不出的**整句删除**，不留占位符。
-- 全文以 ≤180 词为宜——短比长好。
+- 全文首封推荐 ≤180 词（短比长好）；脚本硬限 250 词。
 - 首封绝不出现 chargeback / legal / dispute 字眼。
